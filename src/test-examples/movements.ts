@@ -14,8 +14,8 @@ export function moveSideways(canvas: Canvas, width: number) {
     if (x >= width - 1 || x <= 0) dx *= -1; // flip movement to the opposite side
 
     // 3. Draw Graphics
-    canvas.drawPixel(x, y, "O", "");
-    canvas.drawPixel(x - dx, y, "-", ""); // trail
+    canvas.drawPixel(x, y, "O", "", "");
+    canvas.drawPixel(x - dx, y, "-", "", ""); // trail
 
     // 4. Render to screen
     canvas.render();

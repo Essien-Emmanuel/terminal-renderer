@@ -1,9 +1,11 @@
 export class Cell {
   public char: string;
-  public color: string;
+  public fg: string;
+  public bg: string;
 
-  constructor(char: string, color: string) {
+  constructor(char: string, fg: string, bg: string) {
     this.char = char;
-    this.color = color;
+    this.fg = fg;
+    this.bg = bg;
   }
 }
