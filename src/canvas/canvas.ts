@@ -30,7 +30,7 @@ export class Canvas {
 
   private EMPTY_CELL = { char: " " };
 
-  drawPixel(x: number, y: number, char: string, fg: string, bg: string) {
+  drawPixel(x: number, y: number, char: string, fg?: string, bg?: string) {
     if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
       // y is line (row) and x is column (character pos)
       const index = y * this.width + x;
@@ -39,20 +39,6 @@ export class Canvas {
   }
 
   render() {
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        const index = y * this.width + x;
-
-        const { char, fg, bg } = this.sketchBuffer[index] as Cell;
-
-        // diffing
-        if (char && char !== this.displayBuffer[index]?.char) {
-          Terminal.moveTo(x, y);
-          process.stdout.write(char);
-          this.displayBuffer[index] = { char, fg, bg };
-        }
-      }
-    }
     for (let i = 0; i < this.sketchBuffer.length; i++) {
       const sketchCell = this.sketchBuffer[i];
       const displayCell = this.displayBuffer[i];
@@ -62,8 +48,45 @@ export class Canvas {
       const bgChange = sketchCell?.bg !== displayCell?.bg;
 
       if (charChange || fgChange || bgChange) {
+        const y = Math.floor(i / this.width);
+        const x = i % this.width;
+
+        Terminal.moveTo(x, y);
+
+        let output = "";
+
+        if (sketchCell && (sketchCell.fg || sketchCell.bg)) {
+          output += this.getAnsiCodes(sketchCell);
+        }
+
+        output += sketchCell?.char;
+
+        if (sketchCell && (sketchCell.fg || sketchCell.bg)) {
+          output += this.ANSI_RESET_CODE;
+        }
+
+        process.stdout.write(output);
+
+        if (sketchCell) {
+          this.displayBuffer[i] = { ...sketchCell };
+        }
       }
     }
+  }
+
+  public ANSI_RESET_CODE = "\x1b[0m";
+
+  private getAnsiCodes(cell: Cell) {
+    const codes: string[] = [];
+
+    if (cell.fg) codes.push(cell.fg);
+    if (cell.bg) codes.push(cell.bg);
+
+    if (codes.length === 0) {
+      return "";
+    }
+
+    return `\x1b[${codes.join(";")}m`;
   }
 
   clear() {
@@ -72,20 +95,5 @@ export class Canvas {
     }
   }
 }
-
-Terminal.clearScreen();
-
-const width = 80;
-const height = 24;
-
-const canvas = new Canvas(width, height);
-
-canvas.clear();
-for (let x = 0; x < width; x++) {
-  for (let y = 0; y < height; y++) {
-    canvas.drawPixel(x, y, "#", "", "");
-  }
-}
-canvas.render();
 
 Terminal.showCursor();
