@@ -9,9 +9,10 @@ const height = 24;
 const canvas = new Canvas(width, height);
 
 canvas.clear();
-for (let x = 0; x < width; x++) {
-  for (let y = 0; y < height; y++) {
-    canvas.drawPixel(x, y, "#", "", "");
-  }
-}
+// for (let x = 0; x < width; x++) {
+//   for (let y = 0; y < height; y++) {
+//     canvas.drawPixel(x, y, "#", "", "");
+//   }
+// }
+canvas.drawLine(0, 1, 3, 4, "#");
 canvas.render();
